@@ -1,25 +1,11 @@
-# Logseq Heatmap Plugin
+# DB Activity Heatmap
 
-This fork keeps the original GitHub/Flomo style UI and renders a heatmap based
-on how many bullets were created each day in a Logseq DB graph.
+Shows how many blocks you create each day across your Logseq DB graph.
 
-It reads the indexed `:block/created-at` timestamp and counts nodes with a
-`:block/parent`, so page nodes themselves are not included.
+![DB Activity Heatmap](./screenshot.png)
 
-This fork is read-only and explicitly configured with `"effect": false`.
+## Usage
 
-## How to use?
-
-Firstly, turn on Logseq developer mode
-
-### Option 1: directly install via Marketplace
-
-### Option 2: manually load
-
-- [download the prebuilt package here](https://github.com/vivanotica/logseq-plugin-heatmap/releases)
-- unzip the zip file and load from Logseq plugins page
-
-## Demo
-
-![](./heatmap-demo.gif)
-![](./daterange-selection.gif)
+1. Install the plugin from the Logseq Marketplace.
+2. Select the grid icon in the toolbar.
+3. Hover over a day to see its block count.
