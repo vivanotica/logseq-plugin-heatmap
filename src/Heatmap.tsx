@@ -15,18 +15,15 @@ import "./Heatmap.css";
 import {
   formatAsDashed,
   formatAsLocale,
-  formatAsParam,
   triggerIconName,
-  parseJournalDate,
+  toDate,
   useCurrentJournalDate,
 } from "./utils";
 
 function ErrorFallback({ error }: FallbackProps) {
   return (
     <div role="alert" className="text-red-500 font-semibold">
-      <p>
-        Heatmap failed to render. Can you re-index your graph and try again?
-      </p>
+      <p>Heatmap failed to render. Please try again in a DB graph.</p>
     </div>
   );
 }
@@ -39,20 +36,18 @@ const useActivities = (startDate: string, endDate: string) => {
 
   React.useLayoutEffect(() => {
     (async () => {
-      const date0 = new Date(startDate);
-      const date1 = new Date(endDate);
+      const date0 = toDate(startDate);
+      const date1 = toDate(endDate);
+      date1.setHours(23, 59, 59, 999);
 
       const res: any[] = await logseq.DB.datascriptQuery(`
-        [:find (pull ?p [*]) (count ?b)
+        [:find ?created-at
          :where
-         [?b :block/page ?p]
-         [?p :block/journal? true]
-         [?p :block/journal-day ?d]
-         [?b :block/content ?c]
-         [(clojure.string/blank? ?c) ?empty]
-         [(not ?empty)]
-         [(>= ?d ${formatAsParam(date0)})]
-         [(<= ?d ${formatAsParam(date1)})]]
+         [?b :block/created-at ?created-at]
+         [?b :block/title ?title]
+         [?b :block/parent ?parent]
+         [(>= ?created-at ${date0.getTime()})]
+         [(<= ?created-at ${date1.getTime()})]]
      `);
 
       if (isMounted()) {
@@ -62,18 +57,26 @@ const useActivities = (startDate: string, endDate: string) => {
   }, [startDate, endDate]);
 
   return React.useMemo(() => {
-    const date0 = new Date(startDate);
-    const date1 = new Date(endDate);
-    const mapping = Object.fromEntries(
-      rawValue.map(([page, count]: any[]) => {
-        const date = parseJournalDate(page["journal-day"]);
-        const datum = {
-          count: count ?? 0,
-          date: formatAsDashed(date),
-          originalName: page["original-name"] as string,
+    const date0 = toDate(startDate);
+    const date1 = toDate(endDate);
+    const mapping = rawValue.reduce<Record<string, Datum>>(
+      (result, [createdAt]: any[]) => {
+        const value = Number(createdAt);
+        const date = new Date(value < 10_000_000_000 ? value * 1000 : value);
+        if (Number.isNaN(date.getTime())) {
+          return result;
+        }
+        const key = formatAsDashed(date);
+        const datum = result[key] ?? {
+          count: 0,
+          date: key,
+          originalName: formatAsLocale(date),
         };
-        return [datum.date, datum];
-      })
+        datum.count += 1;
+        result[key] = datum;
+        return result;
+      },
+      {}
     );
 
     const totalDays = differenceInDays(date1, date0) + 1;
@@ -127,7 +130,7 @@ const getTooltipDataAttrs = (value: Datum) => {
   // Configuration for react-tooltip
   const count = value.count === 0 ? "No" : value.count;
   return {
-    "data-tip": `<strong>${count} journal blocks</strong> on <span class="opacity-70">${value.originalName}</span>`,
+    "data-tip": `<strong>${count} bullets</strong> on <span class="opacity-70">${value.originalName}</span>`,
   };
 };
 
@@ -184,7 +187,7 @@ const HeatmapChart = ({
         }}
       />
       <div className="text-xs text-right mt-1">
-        Total journal blocks during this period:{" "}
+        Total bullets during this period:{" "}
         <span className="font-medium">
           {new Intl.NumberFormat().format(totalBlocks)}
         </span>
@@ -207,9 +210,9 @@ const DateRange = ({
 }) => {
   React.useLayoutEffect(() => {
     if (!range) {
-      const endDate = formatAsDashed(endOfWeek(new Date(today)));
+      const endDate = formatAsDashed(endOfWeek(toDate(today)));
       const startDate = formatAsDashed(
-        startOfWeek(addWeeks(endOfWeek(new Date(today)), -NUM_WEEKS))
+        startOfWeek(addWeeks(endOfWeek(toDate(today)), -NUM_WEEKS))
       );
       onRangeChange([startDate, endDate]);
     }
@@ -218,11 +221,11 @@ const DateRange = ({
   const onRangeClick = (isPrev: boolean) => {
     const [, endDate] = range!;
     const newEndDate = formatAsDashed(
-      addWeeks(new Date(endDate), isPrev ? -12 : 12)
+      addWeeks(toDate(endDate), isPrev ? -12 : 12)
     );
 
     const newStartDate = formatAsDashed(
-      startOfWeek(addWeeks(new Date(newEndDate), -NUM_WEEKS))
+      startOfWeek(addWeeks(toDate(newEndDate), -NUM_WEEKS))
     );
 
     onRangeChange([newStartDate, newEndDate]);

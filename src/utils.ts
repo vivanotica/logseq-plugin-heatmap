@@ -52,8 +52,8 @@ export const useCurrentPage = () => {
 export const useCurrentJournalDate = () => {
   const page = useCurrentPage();
   return React.useMemo(() => {
-    if (page && page["journal?"] && page.journalDay) {
-      return parseJournalDate(page.journalDay);
+    if (page && page.journalDay) {
+      return parseJournalDate(page.journalDay as number);
     }
     return null;
   }, [page]);
@@ -93,7 +93,7 @@ export const toDate = (d: Date | string) => {
   if (typeof d !== "string") {
     return d;
   }
-  return new Date(d);
+  return parse(d, "yyyy-MM-dd", new Date());
 };
 
 export const formatAsDashed = (d: Date | string) => {

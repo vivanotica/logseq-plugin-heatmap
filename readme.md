@@ -1,10 +1,12 @@
 # Logseq Heatmap Plugin
 
-This plugin will render a GitHub/Flomo style heatmap based on how many journal
-blocks created that day.
+This fork keeps the original GitHub/Flomo style UI and renders a heatmap based
+on how many bullets were created each day in a Logseq DB graph.
 
-Once Logseq provides an option to denote all blocks with timestamps, we may
-be able to calculate a more accurate block numbers.
+It reads the indexed `:block/created-at` timestamp and counts nodes with a
+`:block/parent`, so page nodes themselves are not included.
+
+This fork is read-only and explicitly configured with `"effect": false`.
 
 ## How to use?
 
@@ -14,7 +16,7 @@ Firstly, turn on Logseq developer mode
 
 ### Option 2: manually load
 
-- [download the prebuilt package here](https://github.com/pengx17/logseq-plugin-heatmap/releases)
+- [download the prebuilt package here](https://github.com/vivanotica/logseq-plugin-heatmap/releases)
 - unzip the zip file and load from Logseq plugins page
 
 ## Demo
