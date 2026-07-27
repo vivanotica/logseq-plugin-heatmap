@@ -1,0 +1,174 @@
+.heatmap-overlay {
+  position: absolute;
+  inset: 0;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.heatmap-root {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  width: fit-content;
+  max-width: calc(100% - 20px);
+  overflow-x: auto;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: #fff;
+  color: #6b7280;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 16%);
+  user-select: none;
+}
+
+.dark .heatmap-root {
+  background: #000;
+  color: #d1d5db;
+}
+
+.heatmap-range {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.heatmap-range button {
+  padding: 1px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: rgb(209 213 219 / 20%);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.heatmap-range button:hover,
+.heatmap-range button:focus-visible {
+  opacity: 1;
+}
+
+.dark .heatmap-range button {
+  border-color: #374151;
+}
+
+.heatmap-status {
+  box-sizing: border-box;
+  width: 416px;
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.heatmap-error {
+  color: #dc2626;
+}
+
+.heatmap-total {
+  margin-top: 4px;
+  text-align: right;
+  font-size: 12px;
+}
+
+.heatmap-total strong {
+  font-weight: 500;
+}
+
+.heatmap-tooltip {
+  position: fixed;
+  z-index: 20;
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: #17211b;
+  color: #fff;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 24%);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.heatmap-tooltip strong,
+.heatmap-tooltip span {
+  display: block;
+}
+
+.heatmap-tooltip span {
+  margin-top: 2px;
+  color: #cbd5ce;
+}
+
+.calendar-heatmap {
+  display: block;
+  overflow: visible;
+}
+
+.calendar-heatmap text {
+  fill: #555;
+  font-size: 8px;
+}
+
+.calendar-heatmap rect {
+  outline: none;
+}
+
+.calendar-heatmap rect:hover {
+  stroke: #555 !important;
+  stroke-width: 1px;
+}
+
+.calendar-heatmap rect.today {
+  stroke: #dd7c09 !important;
+}
+
+.dark .calendar-heatmap rect {
+  stroke: #ffffff0d;
+  stroke-width: 1px;
+}
+
+.dark .calendar-heatmap .color-github-0 {
+  fill: rgb(22 27 34);
+  stroke: transparent;
+}
+
+.dark .calendar-heatmap .color-github-1 {
+  fill: #0e4429;
+}
+
+.dark .calendar-heatmap .color-github-2 {
+  fill: #006d32;
+}
+
+.dark .calendar-heatmap .color-github-3 {
+  fill: #26a641;
+}
+
+.dark .calendar-heatmap .color-github-4 {
+  fill: #39d353;
+}
+
+.light .calendar-heatmap rect {
+  stroke: rgb(27 31 35 / 6%);
+  stroke-width: 1px;
+}
+
+.light .calendar-heatmap .color-github-0 {
+  fill: #eee;
+  stroke: transparent;
+}
+
+.light .calendar-heatmap .color-github-1 {
+  fill: #9be9a8;
+}
+
+.light .calendar-heatmap .color-github-2 {
+  fill: #40c463;
+}
+
+.light .calendar-heatmap .color-github-3 {
+  fill: #30a14e;
+}
+
+.light .calendar-heatmap .color-github-4 {
+  fill: #216e39;
+}

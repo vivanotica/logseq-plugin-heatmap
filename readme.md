@@ -1,23 +1,11 @@
-# Logseq Heatmap Plugin
+# DB Activity Heatmap
 
-This plugin will render a GitHub/Flomo style heatmap based on how many journal
-blocks created that day.
+Shows how many blocks you create each day across your Logseq DB graph.
 
-Once Logseq provides an option to denote all blocks with timestamps, we may
-be able to calculate a more accurate block numbers.
+![DB Activity Heatmap](./screenshot.png)
 
-## How to use?
+## Usage
 
-Firstly, turn on Logseq developer mode
-
-### Option 1: directly install via Marketplace
-
-### Option 2: manually load
-
-- [download the prebuilt package here](https://github.com/pengx17/logseq-plugin-heatmap/releases)
-- unzip the zip file and load from Logseq plugins page
-
-## Demo
-
-![](./heatmap-demo.gif)
-![](./daterange-selection.gif)
+1. Install the plugin from the Logseq Marketplace.
+2. Select the grid icon in the toolbar.
+3. Hover over a day to see its block count.
