@@ -93,6 +93,9 @@ const ActivityGrid = ({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const width = Math.ceil(activities.length / 7) * 16;
   const monthLabels: Array<{ label: string; week: number }> = [];
+  const activityByDate = Object.fromEntries(
+    activities.map((activity) => [activity.date, activity])
+  );
   let previousMonth = -1;
 
   activities.forEach((activity, index) => {
@@ -116,6 +119,21 @@ const ActivityGrid = ({
         viewBox={`0 0 ${width} 132`}
         role="img"
         aria-label="Blocks created by day"
+        onPointerMove={(event) => {
+          const target = event.target as Element | null;
+          const activityDate = target?.getAttribute("data-date");
+          if (!activityDate) return;
+
+          const activity = activityByDate[activityDate];
+          if (!activity) return;
+
+          setTooltip({
+            activity,
+            x: event.clientX,
+            y: event.clientY,
+          });
+        }}
+        onPointerLeave={() => setTooltip(null)}
       >
         {monthLabels.map(({ label, week }) => (
           <text key={`${label}-${week}`} x={week * 16} y="9">
@@ -130,27 +148,13 @@ const ActivityGrid = ({
             width="12"
             height="12"
             rx="3"
+            data-date={activity.date}
             className={[
               `color-github-${scaleCount(activity.count)}`,
               today === activity.date ? "today" : "",
             ]
               .filter(Boolean)
               .join(" ")}
-            onPointerEnter={(event) =>
-              setTooltip({
-                activity,
-                x: event.clientX,
-                y: event.clientY,
-              })
-            }
-            onPointerMove={(event) =>
-              setTooltip({
-                activity,
-                x: event.clientX,
-                y: event.clientY,
-              })
-            }
-            onPointerLeave={() => setTooltip(null)}
           />
         ))}
       </svg>
