@@ -158,7 +158,11 @@ const ActivityGrid = ({
         <div
           className="heatmap-tooltip"
           role="tooltip"
-          style={{ left: tooltip.x + 12, top: tooltip.y - 48 }}
+          style={{
+            left: tooltip.x - 12,
+            top: tooltip.y - 48,
+            transform: "translateX(-100%)",
+          }}
         >
           <strong>{tooltipDateFormatter.format(parseDateKey(tooltip.activity.date))}</strong>
           <span>
