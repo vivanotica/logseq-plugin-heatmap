@@ -127,10 +127,21 @@ const ActivityGrid = ({
           const activity = activityByDate[activityDate];
           if (!activity) return;
 
-          setTooltip({
-            activity,
-            x: event.clientX,
-            y: event.clientY,
+          setTooltip((current) => {
+            const next = {
+              activity,
+              x: event.clientX,
+              y: event.clientY,
+            };
+            if (
+              current &&
+              current.activity.date === activity.date &&
+              current.x === next.x &&
+              current.y === next.y
+            ) {
+              return current;
+            }
+            return next;
           });
         }}
         onPointerLeave={() => setTooltip(null)}
