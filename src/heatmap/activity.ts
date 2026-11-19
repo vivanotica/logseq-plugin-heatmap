@@ -81,6 +81,28 @@ export const getTimestampBounds = (
   addDays(parseDateKey(endDate), 1).getTime() - 1,
 ];
 
+const query = async (q: string): Promise<unknown[][]> => {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const result = await logseq.DB.datascriptQuery(q);
+    if (Array.isArray(result)) return result as unknown[][];
+    await wait(200);
+  }
+  throw new Error("The Logseq DB graph is not ready.");
+};
+
+// journal-day is a yyyymmdd integer, e.g. 20260127
+export const journalDayToTimestamp = (value: unknown): number | null => {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 10000101) return null;
+  const date = new Date(
+    Math.floor(n / 10000),
+    Math.floor((n % 10000) / 100) - 1,
+    n % 100,
+    12
+  );
+  return Number.isNaN(date.getTime()) ? null : date.getTime();
+};
+
 export const fetchCreatedAtRows = async (
   startDate: string,
   endDate: string
@@ -89,22 +111,36 @@ export const fetchCreatedAtRows = async (
     startDate,
     endDate
   );
+  const inRange = (t: number) => t >= startTimestamp && t <= endTimestamp;
 
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const result = await logseq.DB.datascriptQuery(`
-      [:find ?created-at
-       :where
-       [?block :block/created-at ?created-at]
-       [?block :block/parent ?parent]
-       [(>= ?created-at ${startTimestamp})]
-       [(<= ?created-at ${endTimestamp})]]
-    `);
+  // Include ?block so blocks sharing one timestamp (imports, pastes) are not
+  // collapsed by the :find set semantics.
+  const created = await query(`
+    [:find ?block ?created-at
+     :where
+     [?block :block/created-at ?created-at]
+     [?block :block/parent ?parent]]
+  `);
 
-    if (Array.isArray(result)) {
-      return result as CreatedAtRow[];
-    }
-    await wait(200);
+  // Blocks migrated from older graphs may lack :block/created-at; fall back to
+  // the day of the journal page they live on.
+  const undated = await query(`
+    [:find ?block ?day
+     :where
+     [?block :block/parent ?parent]
+     [(missing? $ ?block :block/created-at)]
+     [?block :block/page ?page]
+     [?page :block/journal-day ?day]]
+  `);
+
+  const rows: CreatedAtRow[] = [];
+  for (const [, createdAt] of created) {
+    const date = normalizeCreatedAt(createdAt);
+    if (date && inRange(date.getTime())) rows.push([date.getTime()]);
   }
-
-  throw new Error("The Logseq DB graph is not ready.");
+  for (const [, day] of undated) {
+    const t = journalDayToTimestamp(day);
+    if (t !== null && inRange(t)) rows.push([t]);
+  }
+  return rows;
 };
