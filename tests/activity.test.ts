@@ -3,6 +3,7 @@ import {
   aggregateCreatedBlocks,
   buildActivityRange,
   getTimestampBounds,
+  journalDayToTimestamp,
   normalizeCreatedAt,
 } from "../src/heatmap/activity";
 import { formatDateKey } from "../src/heatmap/dates";
@@ -57,5 +58,13 @@ describe("block activity aggregation", () => {
     expect(new Date(end).getMinutes()).toBe(59);
     expect(new Date(end).getSeconds()).toBe(59);
     expect(new Date(end).getMilliseconds()).toBe(999);
+  });
+
+  it("maps journal-day integers to local noon of that day", () => {
+    const timestamp = journalDayToTimestamp(20260127);
+    expect(timestamp).not.toBeNull();
+    expect(formatDateKey(new Date(timestamp as number))).toBe("2026-01-27");
+    expect(journalDayToTimestamp("nope")).toBeNull();
+    expect(journalDayToTimestamp(123)).toBeNull();
   });
 });
